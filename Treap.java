@@ -3,7 +3,7 @@ import java.util.Random;
 /**
  * Treap: http://ja.wikipedia.org/wiki/Treap
  * 
- * @authors: Austin Nebel, Rhitvik Menon
+ * @authors: Austin Nebel, Rithvik Menon
  * 
 */
 public class Treap <T extends Comparable> {
