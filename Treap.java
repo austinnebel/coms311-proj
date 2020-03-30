@@ -194,11 +194,25 @@ public class Treap <T extends Comparable> {
                 '}';
     }
 
+    /////////////////Nothing above this line has been modified///////////////
+    
+    public intervalInsert() {
+
+    }
+
+    public intervalDelete() {
+        
+    }
+
+    public intervalSearch(int i) {
+    }
     private static class Node<T extends Comparable> {
 
         public Node<T> right, left;
         public final int priority = rand.nextInt();
         public T data;
+        public Interval interv; //the nodes interval
+        public int imax; //the nodes priority
 
         public Node(T data) {
             this.data = data;
@@ -213,5 +227,11 @@ public class Treap <T extends Comparable> {
                     ", right=" + right +
                     '}';
         }
+    }
+
+    private static class Interval<T extends Comparable> {
+
+        public int low, high;
+
     }
 }
