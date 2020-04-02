@@ -1,32 +1,42 @@
 import java.util.Random;
 
+
+public class Main {
+    public static void main(String[] args){
+
+        //Treap treap = new Treap();
+        //treap.add(5);
+    }
+}
+
+
 /**
  * Treap: http://ja.wikipedia.org/wiki/Treap
  * 
  * @authors: Austin Nebel, Rithvik Menon
  * 
 */
-public class Treap <T extends Comparable> {
+public class Treap {
 
     private static final Random rand = new Random();
-    private Node<T> root;
+    private Node<Integer> root;
 
-    public void add(T data) {
+    public void add(Integer data) {
         root = add(root, data);
     }
 
     /* Adds a node to the tree
      * 
      * Args:
-     *      Node<T> node: The root node to rotate
+     *      Node node: The root node to rotate
      * 
      * Returns:
      *      The node that was added to the tree.
      */
-    private Node<T> add(Node<T> root, T data) {
+    private Node add(Node root, Integer data) {
 
         if (root == null)
-            return new Node<T>(data);
+            return new Node(data);
 
         int compare = data.compareTo(root.data);
 
@@ -59,9 +69,9 @@ public class Treap <T extends Comparable> {
      * Args:
      *      Node<T> node: The root node to rotate
      */
-    private Node<T> rotateRight(Node<T> node) {
+    private Node rotateRight(Node node) {
 
-        Node<T> lnode = node.left;
+        Node lnode = node.left;
         node.left = lnode.right;
         lnode.right = node;
         return lnode;
@@ -72,8 +82,8 @@ public class Treap <T extends Comparable> {
      * Args:
      *      Node<T> node: The root node to rotate
      */
-    private Node<T> rotateLeft(Node<T> node) {
-        Node<T> rnode = node.right;
+    private Node rotateLeft(Node node) {
+        Node rnode = node.right;
         node.right = rnode.left;
         rnode.left = node;
         return rnode;
@@ -95,7 +105,7 @@ public class Treap <T extends Comparable> {
      *      Node<T> root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    private Node<T> remove(Node<T> root, T data) {
+    private Node remove(Node root, Integer data) {
 
         if (root != null) {
 
@@ -136,9 +146,9 @@ public class Treap <T extends Comparable> {
      * Returns:
      *      True if the tree contains the data, false otherwise.
      */
-    public boolean contains(T data) {
+    public boolean contains(Integer data) {
 
-        Node<T> node = root;
+        Node node = root;
 
         while (node != null) {
             int compare = data.compareTo(node.data);
@@ -176,9 +186,9 @@ public class Treap <T extends Comparable> {
      * Returns:
      *      The data at the end of the tree
      */
-    private T first(Node<T> root) {
+    private T first(Node root) {
 
-        Node<T> node = root;
+        Node node = root;
         while (node.left != null){
             node = node.left;
         }
@@ -206,15 +216,15 @@ public class Treap <T extends Comparable> {
 
     public intervalSearch(int i) {
     }
-    private static class Node<T extends Comparable> {
+    private static class Node {
 
-        public Node<T> right, left;
+        public Node right, left;
         public final int priority = rand.nextInt();
-        public T data;
+        public Integer data;
         public Interval interv; //the nodes interval
         public int imax; //the nodes priority
 
-        public Node(T data) {
+        public Node(Integer data) {
             this.data = data;
         }
 
@@ -229,9 +239,39 @@ public class Treap <T extends Comparable> {
         }
     }
 
-    private static class Interval<T extends Comparable> {
+    private static class Interval{
 
         public int low, high;
 
+        /**
+         * Returns an integer variable based on the interval overlap.
+         * 
+         * Returns:
+         *      -1 when this is less than comp
+         *              |----this----|
+         *                             |-----comp-----|
+         *       0 when one of these overlaps eachother
+         *                 |-----either------|
+         *                   |----either----|
+         *       1 when this is larger than comp
+         *                              |----this----|
+         *            |-----comp-----|
+         */
+        public int compare(Inteval comp){
+
+            //this is less than comp
+            if(this.high < comp.low){
+                return -1;
+            }
+            //this is greater than comp
+            else if(comp.high < comp.low){
+                return 1;
+            }
+            //one is inside the other
+            else{
+                return 0;
+            }
+        }
     }
 }
+
