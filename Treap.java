@@ -4,8 +4,8 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args){
 
-        //Treap treap = new Treap();
-        //treap.add(5);
+        Treap treap = new Treap();
+        treap.add(5);
     }
 }
 
@@ -47,7 +47,7 @@ public class Treap {
             root.left = add(root.left, data);
 
             //if the root has greater priority than newly added node, rotate right
-            if (root.priority > root.left.priority){
+            if (root.imax > root.left.imax){
                 return rotateRight(root);
             }
         //if data greater than root data
@@ -56,8 +56,8 @@ public class Treap {
             //add data to right
             root.right = add(root.right, data);
 
-            //if the root has greater priority than newly added node, rotate lsft
-            if (root.priority > root.right.priority){
+            //if the root has greater imax than newly added node, rotate lsft
+            if (root.imax > root.right.imax){
                 return rotateLeft(root);
             }
         }
@@ -95,7 +95,7 @@ public class Treap {
      * Args:
      *      T data: The data to be found and removed
      */
-    public void remove(T data) {
+    public void remove(Integer data) {
         root = remove(root, data);
     }
 
@@ -173,7 +173,7 @@ public class Treap {
      * Returns:
      *      The leftmost node in the tree.
      */
-    public T first() {
+    public Integer first() {
         return first(root);
     }
 
@@ -186,7 +186,7 @@ public class Treap {
      * Returns:
      *      The data at the end of the tree
      */
-    private T first(Node root) {
+    private Integer first(Node root) {
 
         Node node = root;
         while (node.left != null){
@@ -222,7 +222,7 @@ public class Treap {
         public final int priority = rand.nextInt();
         public Integer data;
         public Interval interv; //the nodes interval
-        public int imax; //the nodes priority
+        public int imax = rand.nextInt(); //the nodes priority
 
         public Node(Integer data) {
             this.data = data;
@@ -232,7 +232,7 @@ public class Treap {
         public String toString() {
             return "Node{" +
                     "item=" + data +
-                    ", priority=" + priority +
+                    ", priority=" + imax +
                     ", left=" + left +
                     ", right=" + right +
                     '}';
@@ -257,7 +257,7 @@ public class Treap {
          *                              |----this----|
          *            |-----comp-----|
          */
-        public int compare(Inteval comp){
+        public int compareTo(Inteval comp){
 
             //this is less than comp
             if(this.high < comp.low){
