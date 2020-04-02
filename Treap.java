@@ -1,13 +1,7 @@
 import java.util.Random;
 
 
-public class Main {
-    public static void main(String[] args){
 
-        Treap treap = new Treap();
-        treap.add(5);
-    }
-}
 
 
 /**
@@ -18,10 +12,19 @@ public class Main {
 */
 public class Treap {
 
-    private static final Random rand = new Random();
-    private Node<Integer> root;
+    public static void main(String[] args){
 
-    public void add(Integer data) {
+        Treap treap = new Treap();
+        treap.add(new Interval(5,10));
+        treap.add(new Interval(11,15));
+
+        System.out.println(treap.root.toString());
+    }
+
+    private static final Random rand = new Random();
+    private Node root;
+
+    public void add(Interval data) {
         root = add(root, data);
     }
 
@@ -33,18 +36,18 @@ public class Treap {
      * Returns:
      *      The node that was added to the tree.
      */
-    private Node add(Node root, Integer data) {
+    private Node add(Node root, Interval interv) {
 
         if (root == null)
-            return new Node(data);
+            return new Node(interv);
 
-        int compare = data.compareTo(root.data);
+        int compare = interv.compareTo(root.interv);
 
         //if data less than root data
         if (compare < 0) {
 
             //add data to the left 
-            root.left = add(root.left, data);
+            root.left = add(root.left, interv);
 
             //if the root has greater priority than newly added node, rotate right
             if (root.imax > root.left.imax){
@@ -54,7 +57,7 @@ public class Treap {
         } else if (compare > 0) {
 
             //add data to right
-            root.right = add(root.right, data);
+            root.right = add(root.right, interv);
 
             //if the root has greater imax than newly added node, rotate lsft
             if (root.imax > root.right.imax){
@@ -93,10 +96,10 @@ public class Treap {
      * starting at the root.
      * 
      * Args:
-     *      T data: The data to be found and removed
+     *      Interval data: The interval to be found and removed
      */
-    public void remove(Integer data) {
-        root = remove(root, data);
+    public void remove(Interval interv) {
+        root = remove(root, interv);
     }
 
     /* Removes a node from the treap. 
@@ -105,20 +108,20 @@ public class Treap {
      *      Node<T> root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    private Node remove(Node root, Integer data) {
+    private Node remove(Node root, Interval interv) {
 
         if (root != null) {
 
             //Compares root note data to data we're looking for
-            int compare = data.compareTo(root.data);
+            int compare = interv.compareTo(root.interv);
 
             //if data is less than root, recursive call to the left
             if (compare < 0) {
-                root.left = remove(root.left, data);
+                root.left = remove(root.left, interv);
 
             //if data is greater than root, recursive call to the right
             } else if (compare > 0) {
-                root.right = remove(root.right, data);
+                root.right = remove(root.right, interv);
             
             //if data is the same as root data
             } else {
@@ -133,8 +136,8 @@ public class Treap {
 
                 //if root is a leaf node
                 } else {
-                    root.data = first(root.right);
-                    root.right = remove(root.right, root.data);
+                    root.interv = first(root.right);
+                    root.right = remove(root.right, root.interv);
                 }
             }
         }
@@ -146,12 +149,12 @@ public class Treap {
      * Returns:
      *      True if the tree contains the data, false otherwise.
      */
-    public boolean contains(Integer data) {
+    public boolean contains(Interval interv) {
 
         Node node = root;
 
         while (node != null) {
-            int compare = data.compareTo(node.data);
+            int compare = interv.compareTo(node.interv);
 
             //iterates either left or right down the tree
             if (compare < 0){
@@ -173,7 +176,7 @@ public class Treap {
      * Returns:
      *      The leftmost node in the tree.
      */
-    public Integer first() {
+    public Interval first() {
         return first(root);
     }
 
@@ -181,19 +184,19 @@ public class Treap {
      * the specified root.
      *
      * Args:
-     *      Node<T> root: The node to start searching from
+     *      Node root: The node to start searching from
      * 
      * Returns:
-     *      The data at the end of the tree
+     *      The interval at the end of the tree
      */
-    private Integer first(Node root) {
+    private Interval first(Node root) {
 
         Node node = root;
         while (node.left != null){
             node = node.left;
         }
 
-        return node.data;
+        return node.interv;
     }
 
     @Override
@@ -206,32 +209,31 @@ public class Treap {
 
     /////////////////Nothing above this line has been modified///////////////
     
-    public intervalInsert() {
+    public void intervalInsert() {
 
     }
 
-    public intervalDelete() {
+    public void intervalDelete() {
         
     }
 
-    public intervalSearch(int i) {
+    public void intervalSearch(int i) {
     }
+
     private static class Node {
 
         public Node right, left;
-        public final int priority = rand.nextInt();
-        public Integer data;
         public Interval interv; //the nodes interval
         public int imax = rand.nextInt(); //the nodes priority
 
-        public Node(Integer data) {
-            this.data = data;
+        public Node(Interval interv) {
+            this.interv = interv;
         }
 
         @Override
         public String toString() {
             return "Node{" +
-                    "item=" + data +
+                    "item=" + interv.toString() +
                     ", priority=" + imax +
                     ", left=" + left +
                     ", right=" + right +
@@ -243,6 +245,16 @@ public class Treap {
 
         public int low, high;
 
+        public Interval(Integer low, Integer high){
+            this.low = low;
+            this.high = high;
+        }
+
+        @Override
+        public String toString() {
+            return "Interval{"+ low +"-"+ high +"}";
+        }        
+        
         /**
          * Returns an integer variable based on the interval overlap.
          * 
@@ -257,14 +269,14 @@ public class Treap {
          *                              |----this----|
          *            |-----comp-----|
          */
-        public int compareTo(Inteval comp){
+        public int compareTo(Interval comp){
 
             //this is less than comp
             if(this.high < comp.low){
                 return -1;
             }
             //this is greater than comp
-            else if(comp.high < comp.low){
+            else if(this.low > comp.high){
                 return 1;
             }
             //one is inside the other
