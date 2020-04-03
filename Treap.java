@@ -1,4 +1,6 @@
 import java.util.Random;
+import java.util.*;
+import java.lang.*;
 
 /**
  * Treap: http://ja.wikipedia.org/wiki/Treap
@@ -6,48 +8,89 @@ import java.util.Random;
  * @authors: Austin Nebel, Rithvik Menon
  * 
 */
-public class Treap <T extends Comparable> {
+public class Treap {
 
+    private boolean DEBUG = true;
     private static final Random rand = new Random();
-    private Node<T> root;
+    private Node root;
 
-    public void add(T data) {
+    public static void main(String[] args){
+
+        Treap treap = new Treap();
+        treap.add(new Interval(5,10));
+        treap.add(new Interval(11,15));
+        treap.add(new Interval(20,25));
+        treap.add(new Interval(0,1));
+        treap.add(new Interval(3,4));
+
+        System.out.println(treap.root.toString());
+        int d = depthOfTree(treap.root, 1);   
+        printLevelOrder(treap.root, d); 
+        
+ }
+
+    private void print(String message){
+        if(DEBUG){
+            System.out.println(message);
+        }
+    }
+
+    public void add(Interval data) {
         root = add(root, data);
     }
 
     /* Adds a node to the tree
      * 
      * Args:
-     *      Node<T> node: The root node to rotate
-     * 
+     *      Node node: The root node to rotate
+     *      Interval interv: The interval of the new node to be added
      * Returns:
      *      The node that was added to the tree.
      */
-    private Node<T> add(Node<T> root, T data) {
+    private Node add(Node root, Interval interv) {
 
-        if (root == null)
-            return new Node<T>(data);
+        if (root == null){
+            if(this.root == null){
+                print(interv + "is now root");
+            }
+            return new Node(interv);
+        }
 
-        int compare = data.compareTo(root.data);
-
+        print("Insterting " + interv);
         //if data less than root data
-        if (compare < 0) {
+        if (interv.low < root.interv.low) {
+
+            print("Adding " + interv + "to left of root");
 
             //add data to the left 
-            root.left = add(root.left, data);
+            root.left = add(root.left, interv);
 
-            //if the root has greater priority than newly added node, rotate right
-            if (root.priority > root.left.priority){
+            //sets root imax to whatever is larger
+            if(root.left.imax > root.imax){
+                root.imax = root.left.imax;
+            }
+
+            //if new node has higher priority than root, rotate new node 
+            //right to take root node's positition
+            if (root.left.priority < root.priority){
                 return rotateRight(root);
             }
         //if data greater than root data
-        } else if (compare > 0) {
+        } else if (interv.low > root.interv.low) {
+
+            print("Adding " + interv + "to right of root");
 
             //add data to right
-            root.right = add(root.right, data);
+            root.right = add(root.right, interv);
 
-            //if the root has greater priority than newly added node, rotate lsft
-            if (root.priority > root.right.priority){
+            //sets root imax to whatever is larger
+            if(root.right.imax > root.imax){
+                root.imax = root.right.imax;
+            }
+
+            //if new node has higher priority than root, rotate new node 
+            //left to take root node's positition
+            if (root.right.priority < root.priority){
                 return rotateLeft(root);
             }
         }
@@ -57,13 +100,15 @@ public class Treap <T extends Comparable> {
     /* Rotates the treap with root 'node' to the right
      * 
      * Args:
-     *      Node<T> node: The root node to rotate
+     *      Node node: The root node to rotate
      */
-    private Node<T> rotateRight(Node<T> node) {
+    private Node rotateRight(Node root) {
 
-        Node<T> lnode = node.left;
-        node.left = lnode.right;
-        lnode.right = node;
+        Node lnode = root.left;
+        root.left = lnode.right;
+        lnode.right = root;
+        updateImax(root);
+        updateImax(lnode);
         return lnode;
     }
 
@@ -72,21 +117,42 @@ public class Treap <T extends Comparable> {
      * Args:
      *      Node<T> node: The root node to rotate
      */
-    private Node<T> rotateLeft(Node<T> node) {
-        Node<T> rnode = node.right;
-        node.right = rnode.left;
-        rnode.left = node;
+    private Node rotateLeft(Node root) {
+        Node rnode = root.right;
+        root.right = rnode.left;
+        rnode.left = root;
+        updateImax(root);
+        updateImax(rnode);
         return rnode;
+    }
+
+    /**
+     * Updates imax values to be correct. Should be done on rotations
+     * and insertions.
+     */
+    public void updateImax(Node root){
+        if(root == null){
+            return;
+        }
+        if(root.right == null && root.left == null){
+            root.imax = root.interv.high;
+        }else if(root.right == null){
+            root.imax = Math.max(root.interv.high, root.left.imax);
+        }else if(root.left == null){
+            root.imax = Math.max(root.interv.high, root.right.imax);
+        }else{
+            root.imax = Math.max(root.interv.high, Math.max(root.right.imax, root.left.imax));
+        }        
     }
 
     /* Removes a node from the tree that has the specified data,
      * starting at the root.
      * 
      * Args:
-     *      T data: The data to be found and removed
+     *      Interval data: The interval to be found and removed
      */
-    public void remove(T data) {
-        root = remove(root, data);
+    public void remove(Interval interv) {
+        root = remove(root, interv);
     }
 
     /* Removes a node from the treap. 
@@ -95,20 +161,20 @@ public class Treap <T extends Comparable> {
      *      Node<T> root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    private Node<T> remove(Node<T> root, T data) {
+    private Node remove(Node root, Interval interv) {
 
         if (root != null) {
 
             //Compares root note data to data we're looking for
-            int compare = data.compareTo(root.data);
+            int compare = interv.compareTo(root.interv);
 
             //if data is less than root, recursive call to the left
             if (compare < 0) {
-                root.left = remove(root.left, data);
+                root.left = remove(root.left, interv);
 
             //if data is greater than root, recursive call to the right
             } else if (compare > 0) {
-                root.right = remove(root.right, data);
+                root.right = remove(root.right, interv);
             
             //if data is the same as root data
             } else {
@@ -123,8 +189,8 @@ public class Treap <T extends Comparable> {
 
                 //if root is a leaf node
                 } else {
-                    root.data = first(root.right);
-                    root.right = remove(root.right, root.data);
+                    root.interv = first(root.right);
+                    root.right = remove(root.right, root.interv);
                 }
             }
         }
@@ -136,18 +202,17 @@ public class Treap <T extends Comparable> {
      * Returns:
      *      True if the tree contains the data, false otherwise.
      */
-    public boolean contains(T data) {
+    public boolean contains(Interval interv) {
 
-        Node<T> node = root;
+        Node node = root;
 
         while (node != null) {
-            int compare = data.compareTo(node.data);
-
+            
             //iterates either left or right down the tree
-            if (compare < 0){
+            if (interv.low < node.interv.low){
                 node = node.left;
 
-            }else if(compare > 0){
+            }else if(interv.low > node.interv.low){
                 node = node.right;
 
             }else{
@@ -163,7 +228,7 @@ public class Treap <T extends Comparable> {
      * Returns:
      *      The leftmost node in the tree.
      */
-    public T first() {
+    public Interval first() {
         return first(root);
     }
 
@@ -171,19 +236,19 @@ public class Treap <T extends Comparable> {
      * the specified root.
      *
      * Args:
-     *      Node<T> root: The node to start searching from
+     *      Node root: The node to start searching from
      * 
      * Returns:
-     *      The data at the end of the tree
+     *      The interval at the end of the tree
      */
-    private T first(Node<T> root) {
+    private Interval first(Node root) {
 
-        Node<T> node = root;
+        Node node = root;
         while (node.left != null){
             node = node.left;
         }
 
-        return node.data;
+        return node.interv;
     }
 
     @Override
@@ -196,42 +261,142 @@ public class Treap <T extends Comparable> {
 
     /////////////////Nothing above this line has been modified///////////////
     
-    public intervalInsert() {
+    public void intervalInsert() {
 
     }
 
-    public intervalDelete() {
+    public void intervalDelete() {
         
     }
 
-    public intervalSearch(int i) {
+    public void intervalSearch(int i) {
     }
-    private static class Node<T extends Comparable> {
+    
+    static int depthOfTree(Node root, int d) {
+        if(root == null) {
+            return d;
+        }
+        int left = d;
+        int right = d;
+        if(root.left != null) {
+            left = depthOfTree(root.left, d+1);
+        }
+        if(root.right != null) {
+            right = depthOfTree(root.right, d+1);
+        }
+        return Math.max(left, right);
+    }
+      
+    static void printLevelOrder(Node root, int depth)
+    {
+        if(root == null)
+            return;
+    
+        Queue<Node> q =new LinkedList<Node>();
+    
+        q.add(root);            
+        while(true)
+        {               
+            int nodeCount = q.size();
+            if(nodeCount == 0)
+                break;
+            for(int i=0; i<depth; i++) {
+            System.out.print("       ");
+            }
+            while(nodeCount > 0)
+            {    
+                Node node = q.peek();
+                System.out.print(Integer.toString(node.imax) + node.interv);
+    
+                q.remove();
+    
+                if(node.left != null)
+                    q.add(node.left);
+                if(node.right != null)
+                    q.add(node.right);
+    
+                if(nodeCount>1){
+                    System.out.print("         ");
+                }
+                nodeCount--;    
+            }
+            depth--;
+            System.out.println();
+        }
+    }       
 
-        public Node<T> right, left;
-        public final int priority = rand.nextInt();
-        public T data;
+    private static class Node {
+
+        public Node right, left;
         public Interval interv; //the nodes interval
-        public int imax; //the nodes priority
+        public int imax; //the biggest max interval in subtree
+        public int priority = rand.nextInt(1000); //the nodes priority
 
-        public Node(T data) {
-            this.data = data;
+        public Node(Interval interv) {
+            this.interv = interv;
+            this.imax = interv.high;
+        }
+        public Node(Integer a, Integer b) {
+            this.interv = new Interval(a, b);
         }
 
         @Override
         public String toString() {
             return "Node{" +
-                    "item=" + data +
+                    "item=" + interv +
                     ", priority=" + priority +
-                    ", left=" + left +
-                    ", right=" + right +
+                    ", imax=" + imax +
+                    ",\n      left=" + left +
+                    ",\n      right=" + right +
                     '}';
         }
+
+
     }
 
-    private static class Interval<T extends Comparable> {
+    private static class Interval{
 
         public int low, high;
 
+        public Interval(Integer low, Integer high){
+            this.low = low;
+            this.high = high;
+        }
+
+        @Override
+        public String toString() {
+            return "I{"+ low +"-"+ high +"}";
+        }        
+        
+        /**
+         * Returns an integer variable based on the interval overlap.
+         * 
+         * Returns:
+         *      -1 when this is less than comp
+         *              |----this----|
+         *                             |-----comp-----|
+         *       0 when one of these overlaps eachother
+         *                 |-----either------|
+         *                   |----either----|
+         *       1 when this is larger than comp
+         *                              |----this----|
+         *            |-----comp-----|
+         */
+        public int compareTo(Interval comp){
+
+            //this is less than comp
+            if(this.high < comp.low){
+                return -1;
+            }
+            //this is greater than comp
+            else if(this.low > comp.high){
+                return 1;
+            }
+            //one is inside the other
+            else{
+                return 0;
+            }
+        }
     }
 }
+
