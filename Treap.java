@@ -1,8 +1,6 @@
 import java.util.Random;
-
-
-
-
+import java.util.*;
+import java.lang.*;
 
 /**
  * Treap: http://ja.wikipedia.org/wiki/Treap
@@ -12,17 +10,30 @@ import java.util.Random;
 */
 public class Treap {
 
+    private boolean DEBUG = true;
+    private static final Random rand = new Random();
+    private Node root;
+
     public static void main(String[] args){
 
         Treap treap = new Treap();
         treap.add(new Interval(5,10));
         treap.add(new Interval(11,15));
+        treap.add(new Interval(20,25));
+        treap.add(new Interval(0,1));
+        treap.add(new Interval(3,4));
 
         System.out.println(treap.root.toString());
-    }
+        int d = depthOfTree(treap.root, 1);   
+        printLevelOrder(treap.root, d); 
+        
+ }
 
-    private static final Random rand = new Random();
-    private Node root;
+    private void print(String message){
+        if(DEBUG){
+            System.out.println(message);
+        }
+    }
 
     public void add(Interval data) {
         root = add(root, data);
@@ -32,35 +43,54 @@ public class Treap {
      * 
      * Args:
      *      Node node: The root node to rotate
-     * 
+     *      Interval interv: The interval of the new node to be added
      * Returns:
      *      The node that was added to the tree.
      */
     private Node add(Node root, Interval interv) {
 
-        if (root == null)
+        if (root == null){
+            if(this.root == null){
+                print(interv + "is now root");
+            }
             return new Node(interv);
+        }
 
-        int compare = interv.compareTo(root.interv);
-
+        print("Insterting " + interv);
         //if data less than root data
-        if (compare < 0) {
+        if (interv.low < root.interv.low) {
+
+            print("Adding " + interv + "to left of root");
 
             //add data to the left 
             root.left = add(root.left, interv);
 
-            //if the root has greater priority than newly added node, rotate right
-            if (root.imax > root.left.imax){
+            //sets root imax to whatever is larger
+            if(root.left.imax > root.imax){
+                root.imax = root.left.imax;
+            }
+
+            //if new node has higher priority than root, rotate new node 
+            //right to take root node's positition
+            if (root.left.priority < root.priority){
                 return rotateRight(root);
             }
         //if data greater than root data
-        } else if (compare > 0) {
+        } else if (interv.low > root.interv.low) {
+
+            print("Adding " + interv + "to right of root");
 
             //add data to right
             root.right = add(root.right, interv);
 
-            //if the root has greater imax than newly added node, rotate lsft
-            if (root.imax > root.right.imax){
+            //sets root imax to whatever is larger
+            if(root.right.imax > root.imax){
+                root.imax = root.right.imax;
+            }
+
+            //if new node has higher priority than root, rotate new node 
+            //left to take root node's positition
+            if (root.right.priority < root.priority){
                 return rotateLeft(root);
             }
         }
@@ -70,13 +100,15 @@ public class Treap {
     /* Rotates the treap with root 'node' to the right
      * 
      * Args:
-     *      Node<T> node: The root node to rotate
+     *      Node node: The root node to rotate
      */
-    private Node rotateRight(Node node) {
+    private Node rotateRight(Node root) {
 
-        Node lnode = node.left;
-        node.left = lnode.right;
-        lnode.right = node;
+        Node lnode = root.left;
+        root.left = lnode.right;
+        lnode.right = root;
+        updateImax(root);
+        updateImax(lnode);
         return lnode;
     }
 
@@ -85,11 +117,32 @@ public class Treap {
      * Args:
      *      Node<T> node: The root node to rotate
      */
-    private Node rotateLeft(Node node) {
-        Node rnode = node.right;
-        node.right = rnode.left;
-        rnode.left = node;
+    private Node rotateLeft(Node root) {
+        Node rnode = root.right;
+        root.right = rnode.left;
+        rnode.left = root;
+        updateImax(root);
+        updateImax(rnode);
         return rnode;
+    }
+
+    /**
+     * Updates imax values to be correct. Should be done on rotations
+     * and insertions.
+     */
+    public void updateImax(Node root){
+        if(root == null){
+            return;
+        }
+        if(root.right == null && root.left == null){
+            root.imax = root.interv.high;
+        }else if(root.right == null){
+            root.imax = Math.max(root.interv.high, root.left.imax);
+        }else if(root.left == null){
+            root.imax = Math.max(root.interv.high, root.right.imax);
+        }else{
+            root.imax = Math.max(root.interv.high, Math.max(root.right.imax, root.left.imax));
+        }        
     }
 
     /* Removes a node from the tree that has the specified data,
@@ -154,13 +207,12 @@ public class Treap {
         Node node = root;
 
         while (node != null) {
-            int compare = interv.compareTo(node.interv);
-
+            
             //iterates either left or right down the tree
-            if (compare < 0){
+            if (interv.low < node.interv.low){
                 node = node.left;
 
-            }else if(compare > 0){
+            }else if(interv.low > node.interv.low){
                 node = node.right;
 
             }else{
@@ -219,26 +271,87 @@ public class Treap {
 
     public void intervalSearch(int i) {
     }
+    
+    static int depthOfTree(Node root, int d) {
+        if(root == null) {
+            return d;
+        }
+        int left = d;
+        int right = d;
+        if(root.left != null) {
+            left = depthOfTree(root.left, d+1);
+        }
+        if(root.right != null) {
+            right = depthOfTree(root.right, d+1);
+        }
+        return Math.max(left, right);
+    }
+      
+    static void printLevelOrder(Node root, int depth)
+    {
+        if(root == null)
+            return;
+    
+        Queue<Node> q =new LinkedList<Node>();
+    
+        q.add(root);            
+        while(true)
+        {               
+            int nodeCount = q.size();
+            if(nodeCount == 0)
+                break;
+            for(int i=0; i<depth; i++) {
+            System.out.print("       ");
+            }
+            while(nodeCount > 0)
+            {    
+                Node node = q.peek();
+                System.out.print(Integer.toString(node.imax) + node.interv);
+    
+                q.remove();
+    
+                if(node.left != null)
+                    q.add(node.left);
+                if(node.right != null)
+                    q.add(node.right);
+    
+                if(nodeCount>1){
+                    System.out.print("         ");
+                }
+                nodeCount--;    
+            }
+            depth--;
+            System.out.println();
+        }
+    }       
 
     private static class Node {
 
         public Node right, left;
         public Interval interv; //the nodes interval
-        public int imax = rand.nextInt(); //the nodes priority
+        public int imax; //the biggest max interval in subtree
+        public int priority = rand.nextInt(1000); //the nodes priority
 
         public Node(Interval interv) {
             this.interv = interv;
+            this.imax = interv.high;
+        }
+        public Node(Integer a, Integer b) {
+            this.interv = new Interval(a, b);
         }
 
         @Override
         public String toString() {
             return "Node{" +
-                    "item=" + interv.toString() +
-                    ", priority=" + imax +
-                    ", left=" + left +
-                    ", right=" + right +
+                    "item=" + interv +
+                    ", priority=" + priority +
+                    ", imax=" + imax +
+                    ",\n      left=" + left +
+                    ",\n      right=" + right +
                     '}';
         }
+
+
     }
 
     private static class Interval{
@@ -252,7 +365,7 @@ public class Treap {
 
         @Override
         public String toString() {
-            return "Interval{"+ low +"-"+ high +"}";
+            return "I{"+ low +"-"+ high +"}";
         }        
         
         /**
