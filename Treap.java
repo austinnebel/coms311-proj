@@ -339,6 +339,30 @@ public class Treap {
         public Node(Integer a, Integer b) {
             this.interv = new Interval(a, b);
         }
+        
+        public Node getParent() {
+         return this.parent;   
+        }
+        
+        public Node getLeft() {
+         return this.left;   
+        }
+        
+        public Node getRight() {
+         return this.right;   
+        }
+        
+        public Interval getInterv() {
+         return this.interv;   
+        }
+        
+        public int getImax() {
+         return this.imax;   
+        }
+        
+        public int getPriority() {
+         return this.priority;   
+        }
 
         @Override
         public String toString() {
@@ -361,6 +385,14 @@ public class Treap {
         public Interval(Integer low, Integer high){
             this.low = low;
             this.high = high;
+        }
+        
+        public int getLow() {
+         return this.low;   
+        }
+        
+        public int getHigh() {
+         return this.high;   
         }
 
         @Override
