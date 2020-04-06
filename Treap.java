@@ -327,6 +327,86 @@ public class Treap {
         }
     }       
 
+
+    static Node intervalSearchExactly(Interval interv, Node root, int depth)
+    {
+        if(root == null)
+            return null;
+    
+        Queue<Node> q =new LinkedList<Node>();
+    
+        q.add(root);            
+        while(true)
+        {               
+            int nodeCount = q.size();
+            if(nodeCount == 0)
+                break;
+
+            while(nodeCount > 0)
+            {    
+                Node node = q.peek();
+    
+                if(node.interv.low == interv.low && node.interv.high == interv.high){
+                    return node;
+                }
+                q.remove();
+    
+                if(node.left != null)
+                    q.add(node.left);
+                if(node.right != null)
+                    q.add(node.right);
+    
+                nodeCount--;    
+            }
+            depth--;
+        }
+        return null;
+    }       
+
+    
+    static ArrayList<Node> overlappingIntervals(Interval interv, Node root, int depth)
+    {
+        if(root == null)
+            return null;
+    
+        ArrayList<Node> list = new ArrayList<Node>();
+
+        Queue<Node> q =new LinkedList<Node>();
+    
+        q.add(root);            
+        while(true)
+        {               
+            int nodeCount = q.size();
+            if(nodeCount == 0)
+                break;
+
+            while(nodeCount > 0)
+            {    
+                Node node = q.peek();
+    
+                if(node.interv.low < interv.low && node.interv.high > interv.low) {
+                    list.add(node);
+                }
+
+                if(node.interv.low > interv.low && node.interv.low < interv.high) {
+                    list.add(node);
+                }
+
+
+                q.remove();
+    
+                if(node.left != null)
+                    q.add(node.left);
+                if(node.right != null)
+                    q.add(node.right);
+    
+                nodeCount--;    
+            }
+            depth--;
+        }
+        return list;
+    }     
+
     private static class Node {
 
         public Node right, left, parent;
@@ -340,6 +420,8 @@ public class Treap {
         }
         public Node(Integer a, Integer b) {
             this.interv = new Interval(a, b);
+            this.imax = this.interv.high;
+
         }
         
         public Node getParent() {
