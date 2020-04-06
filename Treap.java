@@ -10,9 +10,22 @@ import java.lang.*;
 */
 public class Treap {
 
-    private boolean DEBUG = true;
-    private static final Random rand = new Random();
-    private Node root;
+    public boolean DEBUG = true;
+    public static final Random rand = new Random();
+    public Node root;
+    public int size, height;
+    
+    public Node getRoot() {
+     return this.root;   
+    }
+    
+    public int getSize() {
+     return this.size;   
+    }
+    public int getHeight() {
+     return this.height;   
+    }
+    
 
     public static void main(String[] args){
 
@@ -36,7 +49,7 @@ public class Treap {
     }
 
     public void add(Interval data) {
-        root = add(root, data);
+        root = intervalInsert(root, data);
     }
 
     /* Adds a node to the tree
@@ -47,7 +60,7 @@ public class Treap {
      * Returns:
      *      The node that was added to the tree.
      */
-    private Node add(Node root, Interval interv) {
+    private Node intervalInsert(Node root, Interval interv) {
 
         if (root == null){
             if(this.root == null){
@@ -63,7 +76,7 @@ public class Treap {
             print("Adding " + interv + "to left of root");
 
             //add data to the left 
-            root.left = add(root.left, interv);
+            root.left = intervalInsert(root.left, interv);
 
             //sets root imax to whatever is larger
             if(root.left.imax > root.imax){
@@ -81,7 +94,7 @@ public class Treap {
             print("Adding " + interv + "to right of root");
 
             //add data to right
-            root.right = add(root.right, interv);
+            root.right = intervalInsert(root.right, interv);
 
             //sets root imax to whatever is larger
             if(root.right.imax > root.imax){
@@ -152,7 +165,7 @@ public class Treap {
      *      Interval data: The interval to be found and removed
      */
     public void remove(Interval interv) {
-        root = remove(root, interv);
+        root = intervalDelete(root, interv);
     }
 
     /* Removes a node from the treap. 
@@ -161,7 +174,7 @@ public class Treap {
      *      Node<T> root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    private Node remove(Node root, Interval interv) {
+    private Node intervalDelete(Node root, Interval interv) {
 
         if (root != null) {
 
@@ -170,11 +183,11 @@ public class Treap {
 
             //if data is less than root, recursive call to the left
             if (compare < 0) {
-                root.left = remove(root.left, interv);
+                root.left = intervalDelete(root.left, interv);
 
             //if data is greater than root, recursive call to the right
             } else if (compare > 0) {
-                root.right = remove(root.right, interv);
+                root.right = intervalDelete(root.right, interv);
             
             //if data is the same as root data
             } else {
@@ -190,7 +203,7 @@ public class Treap {
                 //if root is a leaf node
                 } else {
                     root.interv = first(root.right);
-                    root.right = remove(root.right, root.interv);
+                    root.right = intervalDelete(root.right, root.interv);
                 }
             }
         }
@@ -202,7 +215,7 @@ public class Treap {
      * Returns:
      *      True if the tree contains the data, false otherwise.
      */
-    public boolean contains(Interval interv) {
+    public boolean intervalSearch(Interval interv) {
 
         Node node = root;
 
@@ -259,18 +272,7 @@ public class Treap {
                 '}';
     }
 
-    /////////////////Nothing above this line has been modified///////////////
-    
-    public void intervalInsert() {
 
-    }
-
-    public void intervalDelete() {
-        
-    }
-
-    public void intervalSearch(int i) {
-    }
     
     static int depthOfTree(Node root, int d) {
         if(root == null) {
@@ -327,7 +329,7 @@ public class Treap {
 
     private static class Node {
 
-        public Node right, left;
+        public Node right, left, parent;
         public Interval interv; //the nodes interval
         public int imax; //the biggest max interval in subtree
         public int priority = rand.nextInt(1000); //the nodes priority
