@@ -36,7 +36,8 @@ public class Treap {
         treap.add(new Interval(0,1));
         treap.add(new Interval(3,4));
 
-        System.out.println(treap.root.toString());
+        System.out.println(overlappingIntervals(new Interval(9, 21), treap.root, 1));
+        //System.out.println(treap.root.toString());
         int d = depthOfTree(treap.root, 1);   
         printLevelOrder(treap.root, d); 
         
@@ -327,7 +328,18 @@ public class Treap {
         }
     }       
 
-
+    /**
+     * Does level order traversal of tree and returns node
+     * if it matches exactly with the param interv.
+     * 
+     * Args:
+     *      Interval interv: Interval to search
+     *      Node root: root node to search from
+     *      int depth: The depth of the current node
+     * 
+     * Returns:
+     *      The node if found, null otherwise
+     */
     static Node intervalSearchExactly(Interval interv, Node root, int depth)
     {
         if(root == null)
@@ -363,7 +375,17 @@ public class Treap {
         return null;
     }       
 
-    
+    /**
+     * Does level order traversal of tree and returns a list of overlapping intervals.
+     * 
+     * Args:
+     *      Interval interv: Interval to search
+     *      Node root: root node to search from
+     *      int depth: The depth of the current node
+     * 
+     * Returns:
+     *      ArrayList<Node> list of all overlapping intervals
+     */
     static ArrayList<Node> overlappingIntervals(Interval interv, Node root, int depth)
     {
         if(root == null)
@@ -388,7 +410,7 @@ public class Treap {
                     list.add(node);
                 }
 
-                if(node.interv.low > interv.low && node.interv.low < interv.high) {
+                else if(node.interv.low > interv.low && node.interv.low < interv.high) {
                     list.add(node);
                 }
 
@@ -451,11 +473,11 @@ public class Treap {
         @Override
         public String toString() {
             return "Node{" +
-                    "item=" + interv +
+                    "interv=" + interv +
                     ", priority=" + priority +
                     ", imax=" + imax +
-                    ",\n      left=" + left +
-                    ",\n      right=" + right +
+                    //",\n      left=" + left +
+                    //",\n      right=" + right +
                     '}';
         }
 
