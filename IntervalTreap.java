@@ -15,6 +15,8 @@ public class IntervalTreap {
     public Node root;
     public int size, height;
     
+    height = depthOfTree(this.root, 1);
+    
     public Node getRoot() {
         return this.root;   
     }
