@@ -283,7 +283,7 @@ public class IntervalTreap {
                 '}';
     }
 
-    static int depthOfTree(Node root, int d) {
+    public static int depthOfTree(Node root, int d) {
         if(root == null) {
             return d;
         }
@@ -298,7 +298,7 @@ public class IntervalTreap {
         return Math.max(left, right);
     }
       
-    static void printLevelOrder(Node root, int depth)
+    public static void printLevelOrder(Node root, int depth)
     {
         if(root == null)
             return;
