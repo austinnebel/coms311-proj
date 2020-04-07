@@ -8,7 +8,7 @@ import java.lang.*;
  * @authors: Austin Nebel, Rithvik Menon
  * 
 */
-public class Treap {
+public class IntervalTreap {
 
     public boolean DEBUG = true;
     public static final Random rand = new Random();
@@ -16,20 +16,21 @@ public class Treap {
     public int size, height;
     
     public Node getRoot() {
-     return this.root;   
+        return this.root;   
     }
-    
+
     public int getSize() {
-     return this.size;   
+        return this.size;   
     }
+
     public int getHeight() {
-     return this.height;   
+        return this.height;   
     }
     
 
     public static void main(String[] args){
 
-        Treap treap = new Treap();
+        IntervalTreap treap = new IntervalTreap();
         treap.add(new Interval(5,10));
         treap.add(new Interval(11,15));
         treap.add(new Interval(20,25));
@@ -49,6 +50,7 @@ public class Treap {
         }
     }
 
+
     public void add(Interval data) {
         root = intervalInsert(root, data);
     }
@@ -64,115 +66,49 @@ public class Treap {
     private Node intervalInsert(Node root, Interval interv) {
 
         if (root == null){
-            if(this.root == null){
-                print(interv + "is now root");
-            }
             return new Node(interv);
         }
 
-        print("Insterting " + interv);
         //if data less than root data
-        if (interv.low < root.interv.low) {
-
-            print("Adding " + interv + "to left of root");
+        if (interv.getLow() < root.getInterv().getLow()) {
 
             //add data to the left 
-            root.left = intervalInsert(root.left, interv);
+            root.left = intervalInsert(root.getLeft(), interv);
 
             //sets root imax to whatever is larger
-            if(root.left.imax > root.imax){
-                root.imax = root.left.imax;
+            if(root.getLeft().getImax() > root.getImax()){
+                root.imax = root.getLeft().getImax();
             }
 
             //if new node has higher priority than root, rotate new node 
             //right to take root node's positition
-            if (root.left.priority < root.priority){
+            if (root.getLeft().getPriority() < root.getPriority()){
                 return rotateRight(root);
             }
         //if data greater than root data
-        } else if (interv.low > root.interv.low) {
-
-            print("Adding " + interv + "to right of root");
+        } else if (interv.getLow() > root.getInterv().getLow()) {
 
             //add data to right
-            root.right = intervalInsert(root.right, interv);
+            root.right = intervalInsert(root.getRight(), interv);
 
             //sets root imax to whatever is larger
-            if(root.right.imax > root.imax){
-                root.imax = root.right.imax;
+            if(root.getRight().getImax() > root.getImax()){
+                root.imax = root.getRight().getImax();
             }
 
             //if new node has higher priority than root, rotate new node 
             //left to take root node's positition
-            if (root.right.priority < root.priority){
+            if (root.getRight().getPriority() < root.getPriority()){
                 return rotateLeft(root);
             }
         }
         return root;
     }
 
-    /* Rotates the treap with root 'node' to the right
+        /* Removes a node from the treap. 
      * 
      * Args:
-     *      Node node: The root node to rotate
-     */
-    private Node rotateRight(Node root) {
-
-        Node lnode = root.left;
-        root.left = lnode.right;
-        lnode.right = root;
-        updateImax(root);
-        updateImax(lnode);
-        return lnode;
-    }
-
-    /* Rotates the treap with root 'node' to the left
-     * 
-     * Args:
-     *      Node<T> node: The root node to rotate
-     */
-    private Node rotateLeft(Node root) {
-        Node rnode = root.right;
-        root.right = rnode.left;
-        rnode.left = root;
-        updateImax(root);
-        updateImax(rnode);
-        return rnode;
-    }
-
-    /**
-     * Updates imax values to be correct. Should be done on rotations
-     * and insertions.
-     */
-    public void updateImax(Node root){
-        if(root == null){
-            return;
-        }
-        if(root.right == null && root.left == null){
-            root.imax = root.interv.high;
-        }else if(root.right == null){
-            root.imax = Math.max(root.interv.high, root.left.imax);
-        }else if(root.left == null){
-            root.imax = Math.max(root.interv.high, root.right.imax);
-        }else{
-            root.imax = Math.max(root.interv.high, Math.max(root.right.imax, root.left.imax));
-        }        
-    }
-
-    /* Removes a node from the tree that has the specified data,
-     * starting at the root.
-     * 
-     * Args:
-     *      Interval data: The interval to be found and removed
-     */
-    public void remove(Interval interv) {
-        root = intervalDelete(root, interv);
-    }
-
-    /* Removes a node from the treap. 
-     * 
-     * Args:
-     *      Node<T> root: The root node to start searching from
+     *      Node root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
     private Node intervalDelete(Node root, Interval interv) {
@@ -180,31 +116,31 @@ public class Treap {
         if (root != null) {
 
             //Compares root note data to data we're looking for
-            int compare = interv.compareTo(root.interv);
+            int compare = interv.compareTo(root.getInterv());
 
             //if data is less than root, recursive call to the left
             if (compare < 0) {
-                root.left = intervalDelete(root.left, interv);
+                root.left = intervalDelete(root.getLeft(), interv);
 
             //if data is greater than root, recursive call to the right
             } else if (compare > 0) {
-                root.right = intervalDelete(root.right, interv);
+                root.right = intervalDelete(root.getRight(), interv);
             
             //if data is the same as root data
             } else {
 
                 //if only right child exist, return it
-                if (root.left == null) {
-                    return root.right;
+                if (root.getLeft() == null) {
+                    return root.getRight();
 
                 //if only left child exist, return it
-                } else if (root.right == null) {
-                    return root.left;
+                } else if (root.getRight() == null) {
+                    return root.getLeft();
 
                 //if root is a leaf node
                 } else {
-                    root.interv = first(root.right);
-                    root.right = intervalDelete(root.right, root.interv);
+                    root.interv = first(root.getRight());
+                    root.right = intervalDelete(root.getRight(), root.getInterv());
                 }
             }
         }
@@ -223,17 +159,75 @@ public class Treap {
         while (node != null) {
             
             //iterates either left or right down the tree
-            if (interv.low < node.interv.low){
-                node = node.left;
+            if (interv.getLow() < node.getInterv().getLow()){
+                node = node.getLeft();
 
-            }else if(interv.low > node.interv.low){
-                node = node.right;
+            }else if(interv.getLow() > node.getInterv().getLow()){
+                node = node.getRight();
 
             }else{
                 return true;
             }
         }
         return false;
+    }
+
+    /* Rotates the treap with root 'node' to the right
+     * 
+     * Args:
+     *      Node node: The root node to rotate
+     */
+    private Node rotateRight(Node root) {
+
+        Node lnode = root.getLeft();
+        root.left = lnode.getRight();
+        lnode.right = root;
+        updateImax(root);
+        updateImax(lnode);
+        return lnode;
+    }
+
+    /* Rotates the treap with root 'node' to the left
+     * 
+     * Args:
+     *      Node node: The root node to rotate
+     */
+    private Node rotateLeft(Node root) {
+        Node rnode = root.getRight();
+        root.right = rnode.getLeft();
+        rnode.left = root;
+        updateImax(root);
+        updateImax(rnode);
+        return rnode;
+    }
+
+    /**
+     * Updates imax values to be correct. Should be done on rotations
+     * and insertions.
+     */
+    public void updateImax(Node root){
+        if(root == null){
+            return;
+        }
+        if(root.getRight() == null && root.getLeft() == null){
+            root.imax = root.getInterv().getHigh();
+        }else if(root.getRight() == null){
+            root.imax = Math.max(root.getInterv().getHigh(), root.getLeft().getImax());
+        }else if(root.getLeft() == null){
+            root.imax = Math.max(root.getInterv().getHigh(), root.getRight().getImax());
+        }else{
+            root.imax = Math.max(root.getInterv().getHigh(), Math.max(root.getRight().getImax(), root.getLeft().getImax()));
+        }        
+    }
+
+    /* Removes a node from the tree that has the specified data,
+     * starting at the root.
+     * 
+     * Args:
+     *      Interval data: The interval to be found and removed
+     */
+    public void remove(Interval interv) {
+        root = intervalDelete(root, interv);
     }
 
     /* Finds the node furthest to the left in the tree, starting at
@@ -258,11 +252,11 @@ public class Treap {
     private Interval first(Node root) {
 
         Node node = root;
-        while (node.left != null){
-            node = node.left;
+        while (node.getLeft() != null){
+            node = node.getLeft();
         }
 
-        return node.interv;
+        return node.getInterv();
     }
 
     @Override
@@ -281,11 +275,11 @@ public class Treap {
         }
         int left = d;
         int right = d;
-        if(root.left != null) {
-            left = depthOfTree(root.left, d+1);
+        if(root.getLeft() != null) {
+            left = depthOfTree(root.getLeft(), d+1);
         }
-        if(root.right != null) {
-            right = depthOfTree(root.right, d+1);
+        if(root.getRight() != null) {
+            right = depthOfTree(root.getRight(), d+1);
         }
         return Math.max(left, right);
     }
@@ -309,14 +303,14 @@ public class Treap {
             while(nodeCount > 0)
             {    
                 Node node = q.peek();
-                System.out.print(Integer.toString(node.imax) + node.interv);
+                System.out.print(Integer.toString(node.getImax()) + node.getInterv());
     
                 q.remove();
     
-                if(node.left != null)
-                    q.add(node.left);
-                if(node.right != null)
-                    q.add(node.right);
+                if(node.getLeft() != null)
+                    q.add(node.getLeft());
+                if(node.getRight() != null)
+                    q.add(node.getRight());
     
                 if(nodeCount>1){
                     System.out.print("         ");
@@ -358,15 +352,15 @@ public class Treap {
             {    
                 Node node = q.peek();
     
-                if(node.interv.low == interv.low && node.interv.high == interv.high){
+                if(node.getInterv().getLow() == interv.getLow() && node.getInterv().getHigh() == interv.getHigh()){
                     return node;
                 }
                 q.remove();
     
-                if(node.left != null)
-                    q.add(node.left);
-                if(node.right != null)
-                    q.add(node.right);
+                if(node.getLeft() != null)
+                    q.add(node.getLeft());
+                if(node.getRight() != null)
+                    q.add(node.getRight());
     
                 nodeCount--;    
             }
@@ -406,21 +400,21 @@ public class Treap {
             {    
                 Node node = q.peek();
     
-                if(node.interv.low < interv.low && node.interv.high > interv.low) {
+                if(node.getInterv().getLow() < interv.getLow() && node.getInterv().getHigh() > interv.getLow()) {
                     list.add(node);
                 }
 
-                else if(node.interv.low > interv.low && node.interv.low < interv.high) {
+                else if(node.getInterv().getLow() > interv.getLow() && node.getInterv().getLow() < interv.getHigh()) {
                     list.add(node);
                 }
 
 
                 q.remove();
     
-                if(node.left != null)
-                    q.add(node.left);
-                if(node.right != null)
-                    q.add(node.right);
+                if(node.getLeft() != null)
+                    q.add(node.getLeft());
+                if(node.getRight() != null)
+                    q.add(node.getRight());
     
                 nodeCount--;    
             }
@@ -438,11 +432,11 @@ public class Treap {
 
         public Node(Interval interv) {
             this.interv = interv;
-            this.imax = interv.high;
+            this.imax = interv.getHigh();
         }
         public Node(Integer a, Integer b) {
             this.interv = new Interval(a, b);
-            this.imax = this.interv.high;
+            this.imax = this.interv.getHigh();
 
         }
         
@@ -523,11 +517,11 @@ public class Treap {
         public int compareTo(Interval comp){
 
             //this is less than comp
-            if(this.high < comp.low){
+            if(this.getHigh() < comp.getLow()){
                 return -1;
             }
             //this is greater than comp
-            else if(this.low > comp.high){
+            else if(this.getLow() > comp.getHigh()){
                 return 1;
             }
             //one is inside the other
