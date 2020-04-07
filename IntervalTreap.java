@@ -20,6 +20,7 @@ public class IntervalTreap {
     }
 
     public int getSize() {
+        this.size = getSize(this.root);
         return this.size;   
     }
 
@@ -27,6 +28,16 @@ public class IntervalTreap {
         return this.height;   
     }
     
+    public static int getSize(Node n){
+        if(n == null){
+            return 0;
+        }
+
+        int left = getSize(n.getLeft());
+        int right = getSize(n.getRight());
+        
+        return left + right + 1;
+    }
 
     public static void main(String[] args){
 
@@ -34,17 +45,21 @@ public class IntervalTreap {
         treap.add(new Interval(5,10));
         treap.add(new Interval(11,15));
         treap.add(new Interval(20,25));
+        treap.add(new Interval(24,25));
+        treap.add(new Interval(23,25));
+        treap.add(new Interval(22,25));
+        treap.add(new Interval(21,25));
         treap.add(new Interval(0,1));
         treap.add(new Interval(3,4));
 
-        System.out.println(overlappingIntervals(new Interval(9, 21), treap.root, 1));
+        ///System.out.println(overlappingIntervals(new Interval(19, 26)));
+        //System.out.println(getSize(treap.root));
         //System.out.println(treap.root.toString());
-        int d = depthOfTree(treap.root, 1);   
-        printLevelOrder(treap.root, d); 
-        
+        //int d = depthOfTree(treap.root, 1);   
+        p//rintLevelOrder(treap.root, d); 
  }
 
-    private void print(String message){
+    public void print(String message){
         if(DEBUG){
             System.out.println(message);
         }
@@ -63,7 +78,7 @@ public class IntervalTreap {
      * Returns:
      *      The node that was added to the tree.
      */
-    private Node intervalInsert(Node root, Interval interv) {
+    public Node intervalInsert(Node root, Interval interv) {
 
         if (root == null){
             return new Node(interv);
@@ -111,7 +126,7 @@ public class IntervalTreap {
      *      Node root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    private Node intervalDelete(Node root, Interval interv) {
+    public Node intervalDelete(Node root, Interval interv) {
 
         if (root != null) {
 
@@ -177,7 +192,7 @@ public class IntervalTreap {
      * Args:
      *      Node node: The root node to rotate
      */
-    private Node rotateRight(Node root) {
+    public Node rotateRight(Node root) {
 
         Node lnode = root.getLeft();
         root.left = lnode.getRight();
@@ -192,7 +207,7 @@ public class IntervalTreap {
      * Args:
      *      Node node: The root node to rotate
      */
-    private Node rotateLeft(Node root) {
+    public Node rotateLeft(Node root) {
         Node rnode = root.getRight();
         root.right = rnode.getLeft();
         rnode.left = root;
@@ -249,7 +264,7 @@ public class IntervalTreap {
      * Returns:
      *      The interval at the end of the tree
      */
-    private Interval first(Node root) {
+    public Interval first(Node root) {
 
         Node node = root;
         while (node.getLeft() != null){
@@ -267,8 +282,6 @@ public class IntervalTreap {
                 '}';
     }
 
-
-    
     static int depthOfTree(Node root, int d) {
         if(root == null) {
             return d;
@@ -328,13 +341,27 @@ public class IntervalTreap {
      * 
      * Args:
      *      Interval interv: Interval to search
+     * 
+     * Returns:
+     *      The node if found, null otherwise
+     */
+    public Node intervalSearchExactly(Interval interv){
+        return intervalSearchExactly(interv, this.root, 1);
+    }
+
+    /**
+     * Does level order traversal of tree and returns node
+     * if it matches exactly with the param interv.
+     * 
+     * Args:
+     *      Interval interv: Interval to search
      *      Node root: root node to search from
      *      int depth: The depth of the current node
      * 
      * Returns:
      *      The node if found, null otherwise
      */
-    static Node intervalSearchExactly(Interval interv, Node root, int depth)
+    public static Node intervalSearchExactly(Interval interv, Node root, int depth)
     {
         if(root == null)
             return null;
@@ -369,6 +396,21 @@ public class IntervalTreap {
         return null;
     }       
 
+
+
+    /**
+     * Does level order traversal of tree and returns a list of overlapping intervals.
+     * 
+     * Args:
+     *      Interval interv: Interval to search
+     * 
+     * Returns:
+     *      ArrayList<Node> list of all overlapping intervals
+     */
+    public ArrayList<Node> overlappingIntervals(Interval interv){
+        return overlappingIntervals(interv, this.root, 1);
+    }
+
     /**
      * Does level order traversal of tree and returns a list of overlapping intervals.
      * 
@@ -380,7 +422,7 @@ public class IntervalTreap {
      * Returns:
      *      ArrayList<Node> list of all overlapping intervals
      */
-    static ArrayList<Node> overlappingIntervals(Interval interv, Node root, int depth)
+    public static ArrayList<Node> overlappingIntervals(Interval interv, Node root, int depth)
     {
         if(root == null)
             return null;
@@ -423,7 +465,7 @@ public class IntervalTreap {
         return list;
     }     
 
-    private static class Node {
+    public static class Node {
 
         public Node right, left, parent;
         public Interval interv; //the nodes interval
@@ -433,11 +475,6 @@ public class IntervalTreap {
         public Node(Interval interv) {
             this.interv = interv;
             this.imax = interv.getHigh();
-        }
-        public Node(Integer a, Integer b) {
-            this.interv = new Interval(a, b);
-            this.imax = this.interv.getHigh();
-
         }
         
         public Node getParent() {
@@ -478,7 +515,7 @@ public class IntervalTreap {
 
     }
 
-    private static class Interval{
+    public static class Interval{
 
         public int low, high;
 
