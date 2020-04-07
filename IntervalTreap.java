@@ -15,8 +15,6 @@ public class IntervalTreap {
     public Node root;
     public int size, height;
     
-    height = depthOfTree(this.root, 1);
-    
     public Node getRoot() {
         return this.root;   
     }
@@ -27,6 +25,7 @@ public class IntervalTreap {
     }
 
     public int getHeight() {
+        this.height = depthOfTree(this.root, 1);
         return this.height;   
     }
     
@@ -58,7 +57,7 @@ public class IntervalTreap {
         //System.out.println(getSize(treap.root));
         //System.out.println(treap.root.toString());
         //int d = depthOfTree(treap.root, 1);   
-        p//rintLevelOrder(treap.root, d); 
+        //printLevelOrder(treap.root, d); 
  }
 
     public void print(String message){
