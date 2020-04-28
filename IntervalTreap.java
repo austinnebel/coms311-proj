@@ -15,6 +15,28 @@ public class IntervalTreap {
     public Node root;
     public int size, height;
     
+
+    public static void main(String[] args){
+
+        IntervalTreap treap = new IntervalTreap();
+        treap.add(new Interval(5,10));
+        treap.add(new Interval(11,15));
+        treap.add(new Interval(20,25));
+        treap.add(new Interval(24,25));
+        treap.add(new Interval(23,25));
+        treap.add(new Interval(22,25));
+        treap.add(new Interval(21,25));
+        treap.add(new Interval(0,1));
+        treap.add(new Interval(3,4));
+
+        ///System.out.println(overlappingIntervals(new Interval(19, 26)));
+        //System.out.println(getSize(treap.root));
+        //System.out.println(treap.root.toString());
+        //int d = depthOfTree(treap.root, 1);   
+        //printLevelOrder(treap.root, d); 
+    }
+
+
     public Node getRoot() {
         return this.root;   
     }
@@ -40,32 +62,11 @@ public class IntervalTreap {
         return left + right + 1;
     }
 
-    public static void main(String[] args){
-
-        IntervalTreap treap = new IntervalTreap();
-        treap.add(new Interval(5,10));
-        treap.add(new Interval(11,15));
-        treap.add(new Interval(20,25));
-        treap.add(new Interval(24,25));
-        treap.add(new Interval(23,25));
-        treap.add(new Interval(22,25));
-        treap.add(new Interval(21,25));
-        treap.add(new Interval(0,1));
-        treap.add(new Interval(3,4));
-
-        ///System.out.println(overlappingIntervals(new Interval(19, 26)));
-        //System.out.println(getSize(treap.root));
-        //System.out.println(treap.root.toString());
-        //int d = depthOfTree(treap.root, 1);   
-        //printLevelOrder(treap.root, d); 
- }
-
     public void print(String message){
         if(DEBUG){
             System.out.println(message);
         }
     }
-
 
     public void add(Interval data) {
         root = intervalInsert(root, data);
@@ -466,107 +467,6 @@ public class IntervalTreap {
         return list;
     }     
 
-    public static class Node {
-
-        public Node right, left, parent;
-        public Interval interv; //the nodes interval
-        public int imax; //the biggest max interval in subtree
-        public int priority = rand.nextInt(1000); //the nodes priority
-
-        public Node(Interval interv) {
-            this.interv = interv;
-            this.imax = interv.getHigh();
-        }
-        
-        public Node getParent() {
-         return this.parent;   
-        }
-        
-        public Node getLeft() {
-         return this.left;   
-        }
-        
-        public Node getRight() {
-         return this.right;   
-        }
-        
-        public Interval getInterv() {
-         return this.interv;   
-        }
-        
-        public int getImax() {
-         return this.imax;   
-        }
-        
-        public int getPriority() {
-         return this.priority;   
-        }
-
-        @Override
-        public String toString() {
-            return "Node{" +
-                    "interv=" + interv +
-                    ", priority=" + priority +
-                    ", imax=" + imax +
-                    //",\n      left=" + left +
-                    //",\n      right=" + right +
-                    '}';
-        }
-
-
-    }
-
-    public static class Interval{
-
-        public int low, high;
-
-        public Interval(Integer low, Integer high){
-            this.low = low;
-            this.high = high;
-        }
-        
-        public int getLow() {
-         return this.low;   
-        }
-        
-        public int getHigh() {
-         return this.high;   
-        }
-
-        @Override
-        public String toString() {
-            return "I{"+ low +"-"+ high +"}";
-        }        
-        
-        /**
-         * Returns an integer variable based on the interval overlap.
-         * 
-         * Returns:
-         *      -1 when this is less than comp
-         *              |----this----|
-         *                             |-----comp-----|
-         *       0 when one of these overlaps eachother
-         *                 |-----either------|
-         *                   |----either----|
-         *       1 when this is larger than comp
-         *                              |----this----|
-         *            |-----comp-----|
-         */
-        public int compareTo(Interval comp){
-
-            //this is less than comp
-            if(this.getHigh() < comp.getLow()){
-                return -1;
-            }
-            //this is greater than comp
-            else if(this.getLow() > comp.getHigh()){
-                return 1;
-            }
-            //one is inside the other
-            else{
-                return 0;
-            }
-        }
-    }
+    
 }
 
