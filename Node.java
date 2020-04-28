@@ -1,6 +1,8 @@
+import java.util.Random;
 
-public static class Node {
+public class Node {
 
+    public static final Random rand = new Random();
     public Node right, left, parent;
     public Interval interv; //the nodes interval
     public int imax; //the biggest max interval in subtree

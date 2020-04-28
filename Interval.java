@@ -1,5 +1,5 @@
 
-public static class Interval{
+public class Interval{
 
     public int low, high;
 

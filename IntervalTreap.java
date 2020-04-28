@@ -29,11 +29,11 @@ public class IntervalTreap {
         treap.add(new Interval(0,1));
         treap.add(new Interval(3,4));
 
-        ///System.out.println(overlappingIntervals(new Interval(19, 26)));
+        //System.out.println(overlappingIntervals(new Interval(19, 26)));
         //System.out.println(getSize(treap.root));
         //System.out.println(treap.root.toString());
-        //int d = depthOfTree(treap.root, 1);   
-        //printLevelOrder(treap.root, d); 
+        int d = depthOfTree(treap.root, 1);   
+        printLevelOrder(treap.root, d); 
     }
 
 
