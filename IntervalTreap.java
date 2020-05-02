@@ -69,7 +69,7 @@ public class IntervalTreap {
     }
 
     public void add(Interval data) {
-        root = intervalInsert(root, data);
+        root = intervalInsert1(root, data);
     }
 
     /* Adds a node to the tree
@@ -80,7 +80,7 @@ public class IntervalTreap {
      * Returns:
      *      The node that was added to the tree.
      */
-    public Node intervalInsert(Node root, Interval interv) {
+    public Node intervalInsert1(Node root, Interval interv) {
 
         if (root == null){
             return new Node(interv);
@@ -90,7 +90,7 @@ public class IntervalTreap {
         if (interv.getLow() < root.getInterv().getLow()) {
 
             //add data to the left 
-            root.left = intervalInsert(root.getLeft(), interv);
+            root.left = intervalInsert1(root.getLeft(), interv);
 
             //sets root imax to whatever is larger
             if(root.getLeft().getImax() > root.getImax()){
@@ -106,7 +106,7 @@ public class IntervalTreap {
         } else if (interv.getLow() > root.getInterv().getLow()) {
 
             //add data to right
-            root.right = intervalInsert(root.getRight(), interv);
+            root.right = intervalInsert1(root.getRight(), interv);
 
             //sets root imax to whatever is larger
             if(root.getRight().getImax() > root.getImax()){
@@ -121,6 +121,14 @@ public class IntervalTreap {
         }
         return root;
     }
+    
+    
+    public void intervalInsert(Node node) {
+    	
+    	Node z = null;		
+    	z = intervalInsert1(root,node.interv);
+
+    }
 
         /* Removes a node from the treap. 
      * 
@@ -128,20 +136,20 @@ public class IntervalTreap {
      *      Node root: The root node to start searching from
      *      T data: The data of the node to be removed  
      */
-    public Node intervalDelete(Node root, Interval interv) {
+    public Node intervalDelete1(Node root, Interval interv) {
 
         if (root != null) {
 
-            //Compares root note data to data we're looking for
+            //Compares root node data to data we're looking for
             int compare = interv.compareTo(root.getInterv());
 
             //if data is less than root, recursive call to the left
             if (compare < 0) {
-                root.left = intervalDelete(root.getLeft(), interv);
+                root.left = intervalDelete1(root.getLeft(), interv);
 
             //if data is greater than root, recursive call to the right
             } else if (compare > 0) {
-                root.right = intervalDelete(root.getRight(), interv);
+                root.right = intervalDelete1(root.getRight(), interv);
             
             //if data is the same as root data
             } else {
@@ -157,21 +165,30 @@ public class IntervalTreap {
                 //if root is a leaf node
                 } else {
                     root.interv = first(root.getRight());
-                    root.right = intervalDelete(root.getRight(), root.getInterv());
+                    root.right = intervalDelete1(root.getRight(), root.getInterv());
                 }
             }
         }
         return root;
     }
 
-    /* Returns whether the tree contains the specified data.
-     * 
+    public void intervalDelete(Node node) {
+    	
+    	Node z = null;
+    	z = intervalDelete1(root, node.interv);
+    	
+    }
+    
+    
+    /* 
      * Returns:
-     *      True if the tree contains the data, false otherwise.
+     *      The node if the tree contains the data, null otherwise.
      */
-    public boolean intervalSearch(Interval interv) {
+    public Node intervalSearch(Interval interv) {
 
         Node node = root;
+        
+        Node returned = null;
 
         while (node != null) {
             
@@ -183,10 +200,11 @@ public class IntervalTreap {
                 node = node.getRight();
 
             }else{
-                return true;
+                returned = node;
+                return returned;
             }
         }
-        return false;
+        return returned;
     }
 
     /* Rotates the treap with root 'node' to the right
@@ -244,7 +262,7 @@ public class IntervalTreap {
      *      Interval data: The interval to be found and removed
      */
     public void remove(Interval interv) {
-        root = intervalDelete(root, interv);
+        root = intervalDelete1(root, interv);
     }
 
     /* Finds the node furthest to the left in the tree, starting at
@@ -469,4 +487,5 @@ public class IntervalTreap {
 
     
 }
+
 
